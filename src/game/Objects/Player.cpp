@@ -3037,9 +3037,10 @@ void Player::RegenerateAll()
     if (m_regenTimer > 0)
         return;
 
-    // Not in combat or they have regeneration
+    // Not in combat or they have regeneration or recovery
     if (!IsInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT) ||
-            HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) || IsPolymorphed())
+            HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) || IsPolymorphed() ||
+            HasAuraType(SPELL_AURA_MOD_HEALTH_RECOVERY_PERCENT))
     {
         RegenerateHealth();
         if (!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
@@ -3132,12 +3133,12 @@ void Player::RegenerateHealth()
     if (curValue >= maxValue) return;
 
     float HealthIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_HEALTH);
-
+    float healthPercentValue = (float)GetMaxHealth() / 100;
     float addvalue = 0.0f;
 
     // polymorphed case
     if (IsPolymorphed())
-        addvalue = (float)GetMaxHealth() / 10;
+        addvalue = healthPercentValue * 10.0f;
     // normal regen case (maybe partly in combat case)
     else if (!IsInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
     {
@@ -3163,9 +3164,12 @@ void Player::RegenerateHealth()
         }
     }
 
+    // Troll's Blood Potions
+    if (HasAuraType(SPELL_AURA_MOD_HEALTH_RECOVERY_PERCENT))
+            addvalue += healthPercentValue * (GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_RECOVERY_PERCENT) / 2.5f);
     // always regeneration bonus (including combat)
     // This function is called every 2 seconds.
-    addvalue += HealthIncreaseRate * 2.0f * (GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) / 5.0f);
+    addvalue += HealthIncreaseRate * (GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) / 2.5f);
 
     // Health fractions get carried to the next tick
     addvalue += m_carryHealthRegen;
