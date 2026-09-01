@@ -84,5 +84,6 @@ There are some horses, I would like to make those lvl 60 rares.
 - Check gameobject_template 1000091
 - Add quest to make cooking recipe (5482) available for Horde. Reference (4161) `Recipe of the Kaldorei`.
 - Add quest to make cooking recipe (3679) available for Horde. Reference (418) `Thelsamar Blood Sausages`.
+- Add possibility to transform `Strange Dust` into `Lesser Magic Essence`.
 </details>
 
